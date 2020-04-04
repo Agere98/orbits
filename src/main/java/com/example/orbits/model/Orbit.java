@@ -1,6 +1,7 @@
 package com.example.orbits.model;
 
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * A simple data class for modeling orbits around celestial bodies.
@@ -15,6 +16,7 @@ public class Orbit {
     /**
      * The physical body around which this orbit is located.
      */
+    @NonNull
     private final CelestialBody primaryBody;
 
     /**
