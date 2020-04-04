@@ -128,8 +128,13 @@ public class HohmannTransferCalculator {
             throw new IllegalStateException("Orbit data required for calculation has not been set");
         }
 
-        if (startingOrbit.getPrimaryBody().equals(destinationOrbit.getPrimaryBody())) {
+        var startingOrbitBody = startingOrbit.getPrimaryBody();
+        var destinationOrbitBody = destinationOrbit.getPrimaryBody();
+        if (startingOrbitBody.equals(destinationOrbitBody)) {
             calculateOrbitTransfer(startingOrbit, destinationOrbit);
+        } else if (startingOrbitBody.getOrbit() != null && destinationOrbitBody.getOrbit() != null
+                && startingOrbitBody.getOrbit().getPrimaryBody().equals(destinationOrbitBody.getOrbit().getPrimaryBody())) {
+            calculateInterplanetaryTransfer(startingOrbit, destinationOrbit);
         } else {
             throw new IllegalStateException("Orbit data required for calculation is not valid");
         }
@@ -142,5 +147,17 @@ public class HohmannTransferCalculator {
         arrivalDeltaV = destinationOrbit.getOrbitalSpeed()
                 * Math.abs(1d - Math.sqrt(startingOrbit.getRadius() / semiMajorAxis));
         transferTime = Math.PI * Math.sqrt(Math.pow(semiMajorAxis, 3d) / startingOrbit.getStandardGravitationalParameter());
+    }
+
+    private void calculateInterplanetaryTransfer(Orbit startingOrbit, Orbit destinationOrbit) {
+        Orbit startingPlanetOrbit = startingOrbit.getPrimaryBody().getOrbit();
+        Orbit destinationPlanetOrbit = destinationOrbit.getPrimaryBody().getOrbit();
+        calculateOrbitTransfer(startingPlanetOrbit, destinationPlanetOrbit);
+
+        double startingEscapeVelocity = Math.sqrt(2d * startingOrbit.getStandardGravitationalParameter() / startingOrbit.getRadius());
+        insertionDeltaV = Math.abs(Math.sqrt(Math.pow(insertionDeltaV, 2d) + Math.pow(startingEscapeVelocity, 2d)) - startingOrbit.getOrbitalSpeed());
+
+        double destinationEscapeVelocity = Math.sqrt(2d * destinationOrbit.getStandardGravitationalParameter() / destinationOrbit.getRadius());
+        arrivalDeltaV = Math.abs(Math.sqrt(Math.pow(arrivalDeltaV, 2d) + Math.pow(destinationEscapeVelocity, 2d)) - destinationOrbit.getOrbitalSpeed());
     }
 }

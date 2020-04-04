@@ -16,7 +16,7 @@ class HohmannTransferCalculatorTest {
     @BeforeEach
     void setUp() {
         calculator = new HohmannTransferCalculator();
-        CelestialBody primary = new CelestialBody("Sol", 1.989e30);
+        CelestialBody primary = new CelestialBody("Sol", 1.988e30);
         orbit = new Orbit(1.496e11, primary);
     }
 
@@ -50,23 +50,23 @@ class HohmannTransferCalculatorTest {
 
         @Test
         void testOrbitTransferTotalTime() {
-            double expected = 258.86d * 24d * 60d * 60d;
+            double expected = 259.9d * 24d * 60d * 60d;
             assertEquals(expected, calculator.getTransferTime(), expected / 100d);
         }
 
         @Test
         void testOrbitTransferInsertionDeltaV() {
-            assertEquals(2900d, calculator.getInsertionDeltaV(), 100d);
+            assertEquals(2972d, calculator.getInsertionDeltaV(), 1d);
         }
 
         @Test
         void testOrbitTransferArrivalDeltaV() {
-            assertEquals(2700d, calculator.getArrivalDeltaV(), 100d);
+            assertEquals(2670d, calculator.getArrivalDeltaV(), 1d);
         }
 
         @Test
         void testOrbitTransferTotalDeltaV() {
-            assertEquals(5600d, calculator.getTotalDeltaV(), 200d);
+            assertEquals(5642d, calculator.getTotalDeltaV(), 2d);
         }
     }
 
@@ -83,23 +83,62 @@ class HohmannTransferCalculatorTest {
 
         @Test
         void testOrbitTransferTotalTime() {
-            double expected = 258.86d * 24d * 60d * 60d;
+            double expected = 259.9d * 24d * 60d * 60d;
             assertEquals(expected, calculator.getTransferTime(), expected / 100d);
         }
 
         @Test
         void testOrbitTransferInsertionDeltaV() {
-            assertEquals(2700d, calculator.getInsertionDeltaV(), 100d);
+            assertEquals(2670d, calculator.getInsertionDeltaV(), 1d);
         }
 
         @Test
         void testOrbitTransferArrivalDeltaV() {
-            assertEquals(2900d, calculator.getArrivalDeltaV(), 100d);
+            assertEquals(2972d, calculator.getArrivalDeltaV(), 1d);
         }
 
         @Test
         void testOrbitTransferTotalDeltaV() {
-            assertEquals(5600d, calculator.getTotalDeltaV(), 200d);
+            assertEquals(5642d, calculator.getTotalDeltaV(), 2d);
+        }
+    }
+
+    @Nested
+    class InterplanetaryTransferTest {
+
+        @BeforeEach
+        void setUp() {
+            Orbit destinationPlanetOrbit = new Orbit(2.289e11, orbit.getPrimaryBody());
+            CelestialBody startingPlanet = new CelestialBody("Terra", 5.972e24);
+            startingPlanet.setOrbit(orbit);
+            Orbit startingOrbit = new Orbit(6.671e6, startingPlanet);
+            CelestialBody destinationPlanet = new CelestialBody("Mars", 6.417e23);
+            destinationPlanet.setOrbit(destinationPlanetOrbit);
+            Orbit destinationOrbit = new Orbit(3.69e6, destinationPlanet);
+            calculator.setStartingOrbit(startingOrbit);
+            calculator.setDestinationOrbit(destinationOrbit);
+            calculator.calculate();
+        }
+
+        @Test
+        void testOrbitTransferTotalTime() {
+            double expected = 259.9d * 24d * 60d * 60d;
+            assertEquals(expected, calculator.getTransferTime(), expected / 100d);
+        }
+
+        @Test
+        void testOrbitTransferInsertionDeltaV() {
+            assertEquals(3598d, calculator.getInsertionDeltaV(), 1d);
+        }
+
+        @Test
+        void testOrbitTransferArrivalDeltaV() {
+            assertEquals(2102d, calculator.getArrivalDeltaV(), 1d);
+        }
+
+        @Test
+        void testOrbitTransferTotalDeltaV() {
+            assertEquals(5700d, calculator.getTotalDeltaV(), 2d);
         }
     }
 }
