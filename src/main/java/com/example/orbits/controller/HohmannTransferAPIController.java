@@ -5,10 +5,12 @@ import com.example.orbits.model.Orbit;
 import com.example.orbits.service.HohmannTransferCalculator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * An API controller that enables access to a Hohmann transfer calculation service through HTTP requests.
@@ -78,10 +80,14 @@ public class HohmannTransferAPIController {
      */
     @PostMapping(path = "/simple", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HohmannTransferOutput simpleHohmannTransfer(@RequestBody SimpleHohmannTransferInput input) {
-        var primaryBody = new CelestialBody(null, input.getPrimaryBodyMass());
-        var startingOrbit = new Orbit(input.getStartingOrbitRadius(), primaryBody);
-        var destinationOrbit = new Orbit(input.getDestinationOrbitRadius(), primaryBody);
-        return getOutput(startingOrbit, destinationOrbit);
+        try {
+            var primaryBody = new CelestialBody(null, input.getPrimaryBodyMass());
+            var startingOrbit = new Orbit(input.getStartingOrbitRadius(), primaryBody);
+            var destinationOrbit = new Orbit(input.getDestinationOrbitRadius(), primaryBody);
+            return getOutput(startingOrbit, destinationOrbit);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Input parameters are invalid");
+        }
     }
 
     /**
@@ -120,14 +126,18 @@ public class HohmannTransferAPIController {
      */
     @PostMapping(path = "/interplanetary", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HohmannTransferOutput interplanetaryHohmannTransfer(@RequestBody InterplanetaryHohmannTransferInput input) {
-        var primaryBody = new CelestialBody(null, input.getPrimaryBodyMass());
-        var startingPlanet = new CelestialBody(null, input.getStartingPlanetMass());
-        startingPlanet.setOrbit(new Orbit(input.getStartingPlanetOrbitRadius(), primaryBody));
-        var destinationPlanet = new CelestialBody(null, input.getDestinationPlanetMass());
-        destinationPlanet.setOrbit(new Orbit(input.getDestinationPlanetOrbitRadius(), primaryBody));
-        var startingOrbit = new Orbit(input.getStartingOrbitRadius(), startingPlanet);
-        var destinationOrbit = new Orbit(input.getDestinationOrbitRadius(), destinationPlanet);
-        return getOutput(startingOrbit, destinationOrbit);
+        try {
+            var primaryBody = new CelestialBody(null, input.getPrimaryBodyMass());
+            var startingPlanet = new CelestialBody(null, input.getStartingPlanetMass());
+            startingPlanet.setOrbit(new Orbit(input.getStartingPlanetOrbitRadius(), primaryBody));
+            var destinationPlanet = new CelestialBody(null, input.getDestinationPlanetMass());
+            destinationPlanet.setOrbit(new Orbit(input.getDestinationPlanetOrbitRadius(), primaryBody));
+            var startingOrbit = new Orbit(input.getStartingOrbitRadius(), startingPlanet);
+            var destinationOrbit = new Orbit(input.getDestinationOrbitRadius(), destinationPlanet);
+            return getOutput(startingOrbit, destinationOrbit);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Input parameters are invalid");
+        }
     }
 
     private HohmannTransferOutput getOutput(Orbit startingOrbit, Orbit destinationOrbit) {
