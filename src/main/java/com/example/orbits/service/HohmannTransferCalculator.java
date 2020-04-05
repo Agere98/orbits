@@ -2,6 +2,7 @@ package com.example.orbits.service;
 
 import com.example.orbits.model.Orbit;
 import lombok.Getter;
+import org.springframework.stereotype.Component;
 
 /**
  * HohmannTransferCalculator is a class which allows to calculate parameters of Hohmann transfer orbital maneuvers.
@@ -13,6 +14,7 @@ import lombok.Getter;
  * (for example: two orbits around different planets that orbit the same star).
  * If this condition is not met, calculations cannot be performed.
  */
+@Component
 public class HohmannTransferCalculator {
 
     /**
