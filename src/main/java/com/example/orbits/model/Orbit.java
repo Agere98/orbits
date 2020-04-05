@@ -8,16 +8,23 @@ import lombok.NonNull;
  */
 @Data
 public class Orbit {
-    /**
-     * Radius of this orbit, in meters.
-     */
+
     private final double radius;
+    private final CelestialBody primaryBody;
 
     /**
-     * The physical body around which this orbit is located.
+     * Creates an object containing orbit data.
+     *
+     * @param radius      the radius of this orbit (in meters), must be greater than 0.
+     * @param primaryBody the physical body around which this orbit is located.
      */
-    @NonNull
-    private final CelestialBody primaryBody;
+    public Orbit(double radius, @NonNull CelestialBody primaryBody) {
+        if (radius <= 0d) {
+            throw new IllegalArgumentException("Orbit radius must be greater than 0");
+        }
+        this.radius = radius;
+        this.primaryBody = primaryBody;
+    }
 
     /**
      * Returns the standard gravitational parameter (mu) of this orbit's primary body.

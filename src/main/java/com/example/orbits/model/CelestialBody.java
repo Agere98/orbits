@@ -13,20 +13,27 @@ public class CelestialBody {
      */
     private static final double G = 6.674e-11;
 
-    /**
-     * Name of this body.
-     */
     private final String name;
-
-    /**
-     * Mass of this body, in kilograms.
-     */
     private final double mass;
 
     /**
      * Orbit associated with this body.
      */
     private Orbit orbit;
+
+    /**
+     * Creates an object containing celestial body data.
+     *
+     * @param name the name of this body.
+     * @param mass the mass of this body (in kilograms), must be greater than 0.
+     */
+    public CelestialBody(String name, double mass) {
+        if (mass <= 0d) {
+            throw new IllegalArgumentException("Mass must be greater than 0");
+        }
+        this.name = name;
+        this.mass = mass;
+    }
 
     /**
      * Calculates the standard gravitational parameter (mu) of this body.
